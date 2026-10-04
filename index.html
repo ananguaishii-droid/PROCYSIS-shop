@@ -3,114 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROCYSIS SHOP - Cloud Phone Dashboard</title>
+    <title>PROCYSIS SHOP - Cloud Phone Live Dashboard</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0f172a; color: #f8fafc; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid #334155; margin-bottom: 20px; }
-        .title { font-size: 24px; font-weight: bold; color: #38bdf8; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .card { background-color: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 15px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #0b0f19; color: #f1f5f9; padding: 15px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: #1e293b; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155; }
+        .title { font-size: 20px; font-weight: bold; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+        .global-status { font-size: 14px; background: #065f46; color: #34d399; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
+        .card { background: #1e293b; border-radius: 10px; border: 1px solid #334155; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+        
         .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .device-name { font-size: 18px; font-weight: bold; }
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .online { background-color: #059669; color: #ecfdf5; }
-        .offline { background-color: #dc2626; color: #fef2f2; }
-        .input-group { display: flex; flex-direction: column; gap: 6px; }
-        label { font-size: 12px; color: #94a3b8; }
-        input { background-color: #0f172a; border: 1px solid #475569; color: #fff; padding: 10px; border-radius: 6px; font-size: 14px; }
-        .btn-group { display: flex; gap: 10px; margin-top: 5px; }
-        button { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.2s; }
-        .btn-primary { background-color: #0284c7; color: white; }
-        .btn-primary:hover { background-color: #0369a1; }
-        .btn-secondary { background-color: #334155; color: white; }
-        .btn-secondary:hover { background-color: #475569; }
-        .btn-open { background-color: #16a34a; color: white; width: 100%; text-align: center; text-decoration: none; display: block; padding: 12px; border-radius: 6px; font-weight: bold; }
-        .btn-open:hover { background-color: #15803d; }
+        .device-title { font-weight: bold; font-size: 16px; color: #f8fafc; }
+        .badge { font-size: 12px; padding: 3px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .badge-online { background: #059669; color: #ecfdf5; }
+        .badge-offline { background: #dc2626; color: #fef2f2; }
+        
+        /* Display Box สำหรับดูสตรีมเรียลไทม์ */
+        .screen-container { position: relative; width: 100%; height: 220px; background: #090d16; border-radius: 6px; border: 1px solid #475569; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        .live-stream-img { width: 100%; height: 100%; object-fit: contain; display: none; }
+        .screen-placeholder { text-align: center; color: #64748b; font-size: 13px; }
+        .fps-counter { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: #22c55e; }
+
+        /* Control Panel */
+        .controls { display: flex; flex-direction: column; gap: 8px; }
+        .url-input-box { display: flex; gap: 6px; }
+        input[type="text"] { flex: 1; background: #0f172a; border: 1px solid #334155; color: #f8fafc; padding: 6px 10px; border-radius: 4px; font-size: 12px; }
+        
+        .btn { border: none; padding: 8px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.15s; }
+        .btn-set { background: #0284c7; color: white; }
+        .btn-start { background: #16a34a; color: white; flex: 1; }
+        .btn-stop { background: #dc2626; color: white; flex: 1; }
+        .btn-reboot { background: #b91c1c; color: white; width: 100%; margin-top: 4px; }
+        .btn:active { transform: scale(0.98); }
+
+        .info-row { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; background: #0f172a; padding: 6px 10px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="title">⚡ PROCYSIS SHOP - Cloud Phone Manager</div>
+        <div class="title">⭐ PROCYSIS SHOP <span>v6.0</span></div>
+        <div class="global-status" id="globalOnlineCount">🟢 พร้อมใช้งาน</div>
     </div>
 
-    <div class="grid" id="deviceContainer"></div>
+    <div class="grid" id="deviceGrid"></div>
 
     <script>
-        const devices = [
-            { id: 1, name: "VIP-13" },
-            { id: 2, name: "VIP-14" },
-            { id: 3, name: "VIP-15" },
-            { id: 4, name: "VIP-16" }
+        const initialDevices = [
+            { id: 1, name: "MINI (หน้ากลาง)" },
+            { id: 2, name: "VIP 1" },
+            { id: 3, name: "VIP 2" },
+            { id: 4, name: "VIP 3" }
         ];
 
-        function renderDevices() {
-            const container = document.getElementById('deviceContainer');
-            container.innerHTML = '';
+        function loadState(id, key, defaultVal) {
+            return localStorage.getItem(`dev_${id}_${key}`) ?? defaultVal;
+        }
 
-            devices.forEach(dev => {
-                const savedCode = localStorage.getItem(`code_${dev.id}`) || '';
-                const savedLink = localStorage.getItem(`link_${dev.id}`) || '';
-                const isOnline = localStorage.getItem(`status_${dev.id}`) !== 'offline';
+        function saveState(id, key, val) {
+            localStorage.setItem(`dev_${id}_${key}`, val);
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('deviceGrid');
+            grid.innerHTML = '';
+
+            initialDevices.forEach(dev => {
+                const isOnline = loadState(dev.id, 'online', 'true') === 'true';
+                const isRunning = loadState(dev.id, 'running', 'false') === 'true';
+                const streamUrl = loadState(dev.id, 'streamUrl', '');
 
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
                     <div class="card-header">
-                        <span class="device-name">📱 ${dev.name}</span>
-                        <span class="status-badge ${isOnline ? 'online' : 'offline'}" onclick="toggleStatus(${dev.id})">
-                            ${isOnline ? '🟢 Online' : '🔴 Offline'}
+                        <span class="device-title">🟢 ${dev.name}</span>
+                        <span class="badge ${isOnline ? 'badge-online' : 'badge-offline'}" onclick="toggleOnline(${dev.id})">
+                            ${isOnline ? 'ONLINE' : 'OFFLINE'}
                         </span>
                     </div>
 
-                    <div class="input-group">
-                        <label>รหัสสิทธิ์ (Auth Code / Link):</label>
-                        <input type="text" id="input_${dev.id}" value="${savedCode}" placeholder="เช่น MRz7gSwauD หรือ ลิงก์">
+                    <div class="screen-container">
+                        <span class="fps-counter">FPS: ${isOnline ? '30' : '0'}</span>
+                        <img id="img_${dev.id}" class="live-stream-img" src="${streamUrl}" style="display: ${streamUrl && isOnline ? 'block' : 'none'};" alt="Live Stream">
+                        <div id="ph_${dev.id}" class="screen-placeholder" style="display: ${streamUrl && isOnline ? 'none' : 'block'};">
+                            ${!isOnline ? '🔴 เครื่องออฟไลน์อยู่' : (streamUrl ? 'กำลังโหลดภาพสตรีม...' : 'ยังไม่ได้ใส่ Stream / Image URL')}
+                        </div>
                     </div>
 
-                    <div class="btn-group">
-                        <button class="btn-primary" onclick="saveData(${dev.id})">💾 บันทึก</button>
-                        <button class="btn-secondary" onclick="copyCode(${dev.id})">📋 คัดลอกรหัส</button>
+                    <div class="info-row">
+                        <span>สถานะบอท: <b style="color: ${isRunning ? '#4ade80' : '#f87171'}">${isRunning ? 'RUNNING' : 'STOPPED'}</b></span>
+                        <span>เวลาสะสม: <b id="timer_${dev.id}">0h 0m</b></span>
                     </div>
 
-                    <a id="open_btn_${dev.id}" href="${savedLink || '#'}" target="_blank" class="btn-open" style="display: ${savedLink ? 'block' : 'none'};">
-                        🚀 เปิดหน้าจอ Cloud Phone
-                    </a>
+                    <div class="controls">
+                        <div class="url-input-box">
+                            <input type="text" id="url_${dev.id}" value="${streamUrl}" placeholder="วาง Stream / Image URL ตรงนี้">
+                            <button class="btn btn-set" onclick="updateStream(${dev.id})">ตั้งค่า URL</button>
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                            <button class="btn btn-start" onclick="setRunning(${dev.id}, true)">▶ Start Tool</button>
+                            <button class="btn btn-stop" onclick="setRunning(${dev.id}, false)">■ Stop Tool</button>
+                        </div>
+                        <button class="btn btn-reboot" onclick="rebootDevice(${dev.id})">⚡ Reboot เครื่อง</button>
+                    </div>
                 `;
-                container.appendChild(card);
+                grid.appendChild(card);
             });
+
+            updateGlobalStatus();
         }
 
-        function saveData(id) {
-            const val = document.getElementById(`input_${id}`).value.trim();
-            localStorage.setItem(`code_${id}`, val);
+        function toggleOnline(id) {
+            const current = loadState(id, 'online', 'true') === 'true';
+            saveState(id, 'online', !current);
+            renderGrid();
+        }
 
-            let openUrl = val;
-            if (val && !val.startsWith('http://') && !val.startsWith('https://')) {
-                openUrl = `https://www.cloudemulator.net/app/phone`;
+        function setRunning(id, state) {
+            const isOnline = loadState(id, 'online', 'true') === 'true';
+            if (!isOnline) {
+                alert('เครื่องออฟไลน์อยู่ ไม่สามารถกด Start/Stop ได้!');
+                return;
             }
-
-            localStorage.setItem(`link_${id}`, openUrl);
-            alert(`บันทึกข้อมูล ${id} เรียบร้อยแล้ว!`);
-            renderDevices();
+            saveState(id, 'running', state);
+            renderGrid();
         }
 
-        function copyCode(id) {
-            const val = document.getElementById(`input_${id}`).value;
-            if(!val) return alert('ยังไม่มีข้อมูลรหัสให้คัดลอก');
-            navigator.clipboard.writeText(val);
-            alert('คัดลอกรหัสเรียบร้อยแล้ว!');
+        function updateStream(id) {
+            const val = document.getElementById(`url_${id}`).value.trim();
+            saveState(id, 'streamUrl', val);
+            renderGrid();
         }
 
-        function toggleStatus(id) {
-            const current = localStorage.getItem(`status_${id}`);
-            const next = current === 'offline' ? 'online' : 'offline';
-            localStorage.setItem(`status_${id}`, next);
-            renderDevices();
+        function rebootDevice(id) {
+            if (confirm(`คุณต้องการรีบูตเครื่อง ${id} ใช่หรือไม่?`)) {
+                saveState(id, 'running', 'false');
+                alert(`กำลังรีบูตเครื่อง ${id}...`);
+                renderGrid();
+            }
         }
 
-        renderDevices();
+        function updateGlobalStatus() {
+            let onlineCount = 0;
+            initialDevices.forEach(dev => {
+                if (loadState(dev.id, 'online', 'true') === 'true') onlineCount++;
+            });
+            document.getElementById('globalOnlineCount').innerText = `🟢 ${onlineCount}/${initialDevices.length} เครื่องออนไลน์`;
+        }
+
+        renderGrid();
     </script>
 </body>
 </html>
